@@ -17,12 +17,14 @@ import {
 import modelingModule from 'lib/features/modeling';
 import moveModule from 'lib/features/move';
 
+import rulesModule from './rules';
+
 var spy = sinon.spy;
 
 
 describe('features/move - Move', function() {
 
-  beforeEach(bootstrapDiagram({ modules: [ moveModule, modelingModule ] }));
+  beforeEach(bootstrapDiagram({ modules: [ moveModule, modelingModule, rulesModule ] }));
 
   beforeEach(inject(function(canvas, dragging) {
     dragging.setOptions({ manual: true });
@@ -177,6 +179,65 @@ describe('features/move - Move', function() {
         expect(childShape.y).to.eql(110);
       }
     ));
+
+  });
+
+
+  describe.only('rules', function() {
+
+    var immovableShape;
+
+    beforeEach(inject(function(elementFactory, canvas) {
+
+      immovableShape = elementFactory.createShape({
+        id: 'immovable-disallow',
+        x: 200, y: 250, width: 30, height: 30
+      });
+
+      canvas.addShape(immovableShape, parentShape);
+    }));
+
+
+    it('should not start move if rules disallow it', inject(function(eventBus, move) {
+      // given
+      var moveSpy = spy();
+
+      eventBus.on('shape.move.init', moveSpy);
+
+      // when
+      move.start(canvasEvent({ x: 0, y: 0 }), immovableShape);
+
+      // then
+      expect(moveSpy).to.have.not.been.called;
+    }));
+
+
+    it('should disallow root shape movement per default', inject(function(eventBus, move) {
+      // given
+      var moveSpy = spy();
+
+      eventBus.on('shape.move.init', moveSpy);
+
+      // when
+      move.start(canvasEvent({ x: 0, y: 0 }), rootShape);
+
+      // then
+      expect(moveSpy).to.have.not.been.called;
+    }));
+
+
+    it('should disallow connection movement per default', inject(function(eventBus, move) {
+      // given
+      var moveSpy = spy();
+
+      eventBus.on('shape.move.init', moveSpy);
+
+      // when
+      move.start(canvasEvent({ x: 0, y: 0 }), connection);
+
+      // then
+      expect(moveSpy).to.have.not.been.called;
+    }));
 
   });
 

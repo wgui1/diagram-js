@@ -25,6 +25,12 @@ MoveRules.prototype.init = function() {
       return null;
     }
 
+    if (shapes && shapes.some(function(shape) {
+      return /disallow/.test(shape.id);
+    })) {
+      return false;
+    }
+
     // not allowed to move on frame elements
     if (isFrameElement(target)) {
       return false;
