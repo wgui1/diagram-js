@@ -274,7 +274,7 @@ describe('features/auto-place', function() {
       it('should get default distance', function() {
 
         // when
-        var connectedDistance = getConnectedDistance(shape, 'x');
+        var connectedDistance = getConnectedDistance(shape);
 
         // then
         expect(connectedDistance).to.equal(DEFAULT_DISTANCE);
@@ -290,10 +290,28 @@ describe('features/auto-place', function() {
         });
 
         // when
-        var connectedDistance = getConnectedDistance(shape, 'x');
+        var connectedDistance = getConnectedDistance(shape);
 
         // then
         expect(connectedDistance).to.equal(100);
+      }));
+
+
+      it('should accept reference hint', inject(function(modeling) {
+
+        // given
+        modeling.appendShape(shape, newShape, {
+          x: 250,
+          y: 50
+        });
+
+        // when
+        var connectedDistance = getConnectedDistance(shape, {
+          reference: 'end'
+        });
+
+        // then
+        expect(connectedDistance).to.equal(200);
       }));
 
 
@@ -310,10 +328,24 @@ describe('features/auto-place', function() {
         }
 
         // when
-        var connectedDistance = getConnectedDistance(shape, 'x', filter);
+        var connectedDistance = getConnectedDistance(shape, {
+          filter: filter
+        });
 
         // then
         expect(connectedDistance).to.equal(DEFAULT_DISTANCE);
+      }));
+
+
+      it('should accept default distance hint', inject(function(modeling) {
+
+        // when
+        var connectedDistance = getConnectedDistance(shape, {
+          defaultDistance: 100
+        });
+
+        // then
+        expect(connectedDistance).to.equal(100);
       }));
 
 
@@ -326,7 +358,7 @@ describe('features/auto-place', function() {
         });
 
         // when
-        var connectedDistance = getConnectedDistance(shape, 'x', null, {
+        var connectedDistance = getConnectedDistance(shape, {
           maxDistance: 500
         });
 
@@ -363,7 +395,7 @@ describe('features/auto-place', function() {
         it('should weight targets higher than sources by default', function() {
 
           // when
-          var connectedDistance = getConnectedDistance(shape, 'x');
+          var connectedDistance = getConnectedDistance(shape);
 
           // then
           expect(connectedDistance).to.equal(100);
@@ -372,9 +404,14 @@ describe('features/auto-place', function() {
 
         it('should weight sources higher than targets', function() {
 
+          // given
+          function getWeight(connection) {
+            return connection.target === shape ? 5 : 1;
+          }
+
           // when
-          var connectedDistance = getConnectedDistance(shape, 'x', null, {
-            connectionTarget: shape
+          var connectedDistance = getConnectedDistance(shape, {
+            getWeight: getWeight
           });
 
           // then
