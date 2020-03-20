@@ -363,6 +363,38 @@ describe('features/modeling - reconnect connection', function() {
 
   });
 
+
+  describe('hints', function() {
+
+    it('should accept layout hints', inject(function(modeling) {
+
+      // when
+      modeling.reconnect(connection, childShape, connection.target, connection.waypoints, {
+        connectionStart: {
+          x: 0,
+          y: 0
+        },
+        connectionEnd: {
+          x: 100,
+          y: 100
+        }
+      });
+
+      // then
+      expect(connection.waypoints).to.eql([
+        {
+          x: 0,
+          y: 0
+        },
+        {
+          x: 100,
+          y: 100
+        }
+      ]);
+    }));
+
+  });
+
 });
 
 
