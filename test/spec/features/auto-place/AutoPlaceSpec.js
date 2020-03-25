@@ -11,9 +11,10 @@ import selectionModule from 'lib/features/selection';
 import { getMid } from 'lib/layout/LayoutUtil';
 
 import {
-  deconflictPosition,
   getConnectedAtPosition,
-  getConnectedDistance
+  getConnectedDistance,
+  getFreePosition,
+  simpleGetNextPosition
 } from 'lib/features/auto-place/AutoPlaceUtil';
 
 import { DEFAULT_DISTANCE } from 'lib/features/auto-place/AutoPlaceUtil';
@@ -176,7 +177,7 @@ describe('features/auto-place', function() {
 
   describe('util', function() {
 
-    describe('#deconflictPosition', function() {
+    describe('#getFreePosition', function() {
 
       it('should not have to deconflict', inject(function(modeling) {
 
@@ -194,12 +195,13 @@ describe('features/auto-place', function() {
         };
 
         // when
-        var deconflictedPosition = deconflictPosition(shape, newShape, position, escapeDirection);
+        var freePosition =
+          getFreePosition(shape, newShape, position, simpleGetNextPosition(escapeDirection));
 
-        modeling.appendShape(shape, newShape, deconflictedPosition);
+        modeling.appendShape(shape, newShape, freePosition);
 
         // then
-        expect(deconflictedPosition).to.eql(position);
+        expect(freePosition).to.eql(position);
       }));
 
 
@@ -227,12 +229,13 @@ describe('features/auto-place', function() {
         };
 
         // when
-        var deconflictedPosition = deconflictPosition(shape, newShape, position, escapeDirection);
+        var freePosition =
+          getFreePosition(shape, newShape, position, simpleGetNextPosition(escapeDirection));
 
-        modeling.appendShape(shape, newShape, deconflictedPosition);
+        modeling.appendShape(shape, newShape, freePosition);
 
         // then
-        expect(deconflictedPosition).to.eql({
+        expect(freePosition).to.eql({
           x: 200,
           y: 200
         });
